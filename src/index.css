@@ -1,0 +1,14 @@
+@import url("https://fonts.googleapis.com/css2?family=Urbanist:ital,wght@0,100..900;1,100..900&display=swap");
+@import "tailwindcss";
+@plugin "daisyui";
+
+* {
+  font-family: "Urbanist", sans-serif;
+}
+
+.dashboard .active {
+  @apply bg-green-300 text-gray-800 transition-all duration-300;
+}
+.navbar .active {
+  @apply underline underline-offset-5 font-bold;
+}
