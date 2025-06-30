@@ -2,6 +2,8 @@ import { useForm } from "react-hook-form";
 import { Link, useLocation, useNavigate } from "react-router";
 import GoogleLogin from "../shared/GoogleLogin";
 import useAuth from "../../../hooks/useAuth";
+import useAxios from "../../../hooks/useAxios";
+import toast from "react-hot-toast";
 
 const Login = () => {
   const {
@@ -12,18 +14,28 @@ const Login = () => {
   const { signIn } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+  const axiosInstance = useAxios();
   const reDirect = location.state ? location.state : "/";
   const handleLogin = (data) => {
     signIn(data.email, data.password)
-      .then((result) => {
-        if (result.user) {
+      .then(async (result) => {
+        const user = result.user;
+        if (user) {
+          await axiosInstance.post("/users/upsert", {
+            email: user.email,
+            name: user.displayName || "Unnamed",
+            photo: user.photoURL || "https://example.com/default-avatar.jpg",
+          });
+          toast.success("Login successful");
           navigate(reDirect);
         }
       })
       .catch((error) => {
-        console.log(error.message, error.code);
+        toast.error("Incorrect email or password.");
+        console.error(error.message);
       });
   };
+  
   return (
     <>
       <div className="w-full max-w-md p-8 space-y-3 rounded-xl dark:text-gray-800">

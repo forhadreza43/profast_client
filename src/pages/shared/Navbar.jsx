@@ -3,13 +3,16 @@ import ProfastLogo from "./profastLogo/ProfastLogo";
 import useAuth from "../../hooks/useAuth";
 import Loading from "../../components/Shared/Loading";
 import DarkModeToggle from "../../components/DarkModeToggle";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
 
 const Navbar = () => {
   const { user, logOut } = useAuth();
   const navigate = useNavigate();
+  const axiosSecure = useAxiosSecure();
   const handleLogOut = async () => {
     await logOut()
-      .then(() => {
+      .then(async () => {
+        await axiosSecure.post("/logout");
         alert("Log out Successful");
         navigate("/");
       })
@@ -27,6 +30,9 @@ const Navbar = () => {
       </li>
       <li>
         <NavLink to="/sendParcel">Send Parcel</NavLink>
+      </li>
+      <li>
+        <NavLink to="/beARider">Be A Rider</NavLink>
       </li>
       {user && (
         <li>

@@ -1,24 +1,37 @@
 import React from "react";
 import useAuth from "../../../hooks/useAuth";
 import { useLocation, useNavigate } from "react-router";
+import useAxios from "../../../hooks/useAxios";
+import toast from "react-hot-toast";
 
 const GoogleLogin = () => {
   const { googleSignIn } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+  const axiosInstance = useAxios();
   const reDirect = location.state ? location.state : "/";
   // console.log(reDirect);
   const handleGoogleLogin = () => {
     googleSignIn()
-      .then((result) => {
-        if (result.user) {
+      .then(async (result) => {
+        const user = result.user;
+        if (user) {
+          await axiosInstance.post("/users/upsert", {
+            email: user.email,
+            name: user.displayName || "Unnamed",
+            photo: user.photoURL || "https://example.com/default-avatar.jpg",
+            role: "user",
+          });
+          toast.success("Login successful");
           navigate(reDirect);
         }
       })
       .catch((error) => {
-        console.log(error.message, error.code);
+        console.error(error.message);
+        toast.error("Google login failed");
       });
   };
+
   return (
     <div className="w-full flex items-center justify-center">
       <button

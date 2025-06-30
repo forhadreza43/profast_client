@@ -1,7 +1,10 @@
 import { useForm } from "react-hook-form";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import GoogleLogin from "../shared/GoogleLogin";
 import useAuth from "../../../hooks/useAuth";
+import toast from "react-hot-toast";
+import axios from "axios";
+import useAxios from "../../../hooks/useAxios";
 
 const Register = () => {
   const {
@@ -10,24 +13,59 @@ const Register = () => {
     formState: { errors },
   } = useForm();
   const { createUser, updateUserProfile } = useAuth();
+  const axiosInstance = useAxios();
+  const navigate = useNavigate();
 
-  const handleRegister = (data) => {
-    console.log(data);
-    const UpdateInfo = {
-      displayName: data.name,
-      // photoURL: "https://example.com/jane-q-user/profile.jpg",
-    };
+  const handleRegister = async (data) => {
+    try {
+      // 1. Upload image to imgbb
+      const imageFile = data.photo[0];
+      const formData = new FormData();
+      formData.append("image", imageFile);
 
-    createUser(data.email, data.password)
-      .then((result) => {
-        if (result.user) {
-          updateUserProfile(UpdateInfo);
-        }
-      })
-      .catch((error) => {
-        console.log(error.message, error.code);
+      const imageRes = await axios.post(
+        `https://api.imgbb.com/1/upload?key=${
+          import.meta.env.VITE_IMGBB_API_KEY
+        }`,
+        formData
+      );
+
+      const imgData = imageRes.data;
+      if (!imgData.success) throw new Error("Image upload failed.");
+
+      const imgURL = imgData.data.url;
+
+      // 2. Try to create user in Firebase
+      const result = await createUser(data.email, data.password);
+      const user = result.user;
+      if (!user) throw new Error("User creation failed.");
+
+      // 3. Save user info in your backend (using upsert)
+      await axiosInstance.post("/users/upsert", {
+        email: data.email,
+        name: data.name,
+        photo: imgURL,
+        role:'user'
       });
+
+      // 4. Update Firebase profile
+      await updateUserProfile({
+        displayName: data.name,
+        photoURL: imgURL,
+      });
+
+      toast.success("Registered successfully!");
+      navigate("/login");
+    } catch (err) {
+      if (err.code === "auth/email-already-in-use") {
+        toast.error("This email is already registered. Please log in.");
+      } else {
+        console.error("Registration error:", err.message);
+        toast.error(err.message || "Registration failed.");
+      }
+    }
   };
+
   return (
     <>
       <div className="w-full max-w-md p-8 space-y-3 rounded-xl dark:text-gray-800">
@@ -42,6 +80,12 @@ const Register = () => {
           className="space-y-6"
         >
           <div className="space-y-1 text-sm">
+            <label
+              htmlFor="photo"
+              className="block font-bold dark:text-gray-600"
+            >
+              Upload Image
+            </label>
             <input
               {...register("photo")}
               type="file"
