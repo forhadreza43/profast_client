@@ -8,8 +8,14 @@ import {
   FaUserEdit,
   FaUserCheck,
   FaUserClock,
+  FaMotorcycle,
+  FaClock,
+  FaCheckCircle
 } from "react-icons/fa";
+import { MdAdminPanelSettings } from "react-icons/md";
+import useUserRole from "../hooks/useUserRole";
 const DashboardLayout = () => {
+  const { role, isLoading } = useUserRole();
   return (
     <>
       <div className="drawer lg:drawer-open">
@@ -80,16 +86,44 @@ const DashboardLayout = () => {
                 <FaUserEdit className="mr-2" /> Update Profile
               </NavLink>
             </li>
-            <li>
-              <NavLink to="/dashboard/active-riders">
-                <FaUserEdit className="mr-2" /> Active Riders
-              </NavLink>
-            </li>
-            <li>
-              <NavLink to="/dashboard/pending-riders">
-                <FaUserEdit className="mr-2" /> Pending Riders
-              </NavLink>
-            </li>
+            {!isLoading && role === "admin" && (
+              <>
+                <li>
+                  <NavLink to="/dashboard/active-riders">
+                    <FaUserCheck className="mr-2" /> Active Riders
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink to="/dashboard/pending-riders">
+                    <FaUserClock className="mr-2" /> Pending Riders
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink to="/dashboard/manage-admin">
+                    <MdAdminPanelSettings className="mr-2" /> Mange Admin
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink to="/dashboard/assign-rider">
+                    <FaMotorcycle className="mr-2" /> Assign Rider
+                  </NavLink>
+                </li>
+              </>
+            )}
+            {!isLoading && role === "rider" && (
+              <>
+                <li>
+                  <NavLink to="/dashboard/pending-deliveries">
+                    <FaClock className="mr-2" /> Pending Deliveries
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink to="/dashboard/complete-deliveries">
+                    <FaCheckCircle className="mr-2" /> Complete Deliveries
+                  </NavLink>
+                </li>
+              </>
+            )}
           </ul>
         </div>
       </div>

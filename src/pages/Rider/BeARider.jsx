@@ -49,8 +49,7 @@ const BeARider = () => {
   const onSubmit = (data) => {
     const riderData = {
       ...data,
-      name: user?.displayName || "",
-      email: user?.email || "",
+      email: user?.email ||"",
       status: "pending",
       created_at: new Date().toISOString(),
     };

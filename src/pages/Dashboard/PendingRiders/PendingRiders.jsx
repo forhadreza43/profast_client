@@ -18,9 +18,11 @@ const PendingRiders = () => {
 
   // Approve mutation
   const approveMutation = useMutation({
-    mutationFn: async (riderId) => {
+    mutationFn: async ({ riderId, riderEmail }) => {
+      // console.log(riderEmail);
       return await axiosSecure.patch(`/riders/${riderId}`, {
         status: "approved",
+        email: riderEmail,
       });
     },
     onSuccess: () => {
@@ -48,7 +50,7 @@ const PendingRiders = () => {
     },
   });
 
-  const handleApprove = (riderId) => {
+  const handleApprove = (riderId, riderEmail) => {
     Swal.fire({
       title: "Are you sure?",
       text: "Approve this rider?",
@@ -59,7 +61,7 @@ const PendingRiders = () => {
       confirmButtonText: "Yes, approve",
     }).then((result) => {
       if (result.isConfirmed) {
-        approveMutation.mutate(riderId);
+        approveMutation.mutate({ riderId, riderEmail });
       }
     });
   };
@@ -128,19 +130,19 @@ const PendingRiders = () => {
                   onClick={() => handleSeeApplication(rider)}
                   className="btn btn-sm bg-blue-500 text-white"
                 >
-                  See Application
+                  👁️
                 </button>
                 <button
-                  onClick={() => handleApprove(rider._id)}
+                  onClick={() => handleApprove(rider._id, rider.email)}
                   className="btn btn-sm bg-green-500 text-white"
                 >
-                  Approve
+                  ✔️
                 </button>
                 <button
                   onClick={() => handleReject(rider._id)}
                   className="btn btn-sm bg-red-500 text-white"
                 >
-                  Reject
+                  ❌
                 </button>
               </td>
             </tr>

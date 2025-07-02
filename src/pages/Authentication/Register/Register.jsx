@@ -55,7 +55,7 @@ const Register = () => {
       });
 
       toast.success("Registered successfully!");
-      navigate("/login");
+      navigate("/");
     } catch (err) {
       if (err.code === "auth/email-already-in-use") {
         toast.error("This email is already registered. Please log in.");

@@ -17,6 +17,13 @@ import UpdateProfile from "../pages/Dashboard/UpdateProfile/UpdateProfile";
 import BeARider from "../pages/Rider/BeARider";
 import PendingRiders from "../pages/Dashboard/PendingRiders/PendingRiders";
 import ActiveRiders from "../pages/Dashboard/ActiveRiders/ActiveRiders";
+import AboutUs from "../pages/AboutUs/AboutUs";
+import AdminManager from "../pages/Dashboard/Admin/AdminManager";
+import AdminRoute from "./AdminRoute";
+import Unauthorized from "../pages/UnAuthorized/Unauthorized";
+import AssignRider from "../pages/Dashboard/AssignRider/AssignRider";
+import PendingDeliveries from "../pages/Dashboard/PendingDeliveries/PendingDeliveries";
+import CompletesDeliveries from "../pages/Dashboard/CompletesDeliveries/CompletesDeliveries";
 
 const router = createBrowserRouter([
   {
@@ -46,6 +53,14 @@ const router = createBrowserRouter([
             <BeARider />
           </PrivateRoute>
         ),
+      },
+      {
+        path: "about",
+        Component: AboutUs,
+      },
+      {
+        path: "unauthorized",
+        element: <Unauthorized />,
       },
     ],
   },
@@ -102,11 +117,43 @@ const router = createBrowserRouter([
       },
       {
         path: "pending-riders",
-        element: <PendingRiders />,
+        element: (
+          <AdminRoute>
+            <PendingRiders />
+          </AdminRoute>
+        ),
       },
       {
         path: "active-riders",
-        element: <ActiveRiders />,
+        element: (
+          <AdminRoute>
+            <ActiveRiders />
+          </AdminRoute>
+        ),
+      },
+      {
+        path: "manage-admin",
+        element: (
+          <AdminRoute>
+            <AdminManager />
+          </AdminRoute>
+        ),
+      },
+      {
+        path: "assign-rider",
+        element: (
+          <AdminRoute>
+            <AssignRider />
+          </AdminRoute>
+        ),
+      },
+      {
+        path: "pending-deliveries",
+        element: <PendingDeliveries />,
+      },
+      {
+        path: "complete-deliveries",
+        element: <CompletesDeliveries />,
       },
     ],
   },
